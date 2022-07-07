@@ -29,6 +29,8 @@ Installed through [HACS](https://hacs.xyz/).
 Add `https://github.com/skarbo/hass-scinan-thermostat` as repository in `Repository` field.
 Select `Integration` as `Category`.
 
+`Scinan Thermostat` is now displayed in HACS integrations. Select it and press `Download this repository with HACS`.
+
 Restart Home Assistant.
 
 _Will be added as a default HACS integration later on._

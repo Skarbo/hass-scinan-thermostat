@@ -1,0 +1,17 @@
+{
+  "domain": "scinan_thermostat",
+  "name": "Scinan Thermostat",
+  "documentation": "https://github.com/Skarbo/hass-scinan-thermostat",
+  "issue_tracker": "https://github.com/Skarbo/hass-scinan-thermostat/issues",
+  "requirements": [],
+  "codeowners": [
+    "@skarbo"
+  ],
+  "config_flow": true,
+  "iot_class": "cloud_polling",
+  "loggers": [
+    "scinan",
+    "scinan_thermostat"
+  ],
+  "version": "1.0.0"
+}

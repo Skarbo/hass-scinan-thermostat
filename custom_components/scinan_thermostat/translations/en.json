@@ -1,0 +1,19 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Account is already configured"
+    },
+    "error": {
+      "auth_error": "Invalid email or password",
+      "cannot_connect": "Authentication error, try again later"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "password": "Password",
+          "username": "Username"
+        }
+      }
+    }
+  }
+}

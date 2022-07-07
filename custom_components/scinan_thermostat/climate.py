@@ -145,15 +145,18 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
         if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
             return
 
+        was_away = self.is_away
         await self.coordinator.api_wrapper(
             self.coordinator.scinan_api.set_temperature(
                 self._id,
                 float(temperature)
             ),
-            # no need to refresh data
+            # changing temperature when away will turn off away mode
+            # refresh device data if it was away
+            was_away
         )
-        # state has been updated
-        await self.async_update_ha_state()
+        if not was_away:
+            await self.async_update_ha_state()
 
     async def async_turn_on(self) -> None:
         """Turn the device on. Using the away feature to turn on."""

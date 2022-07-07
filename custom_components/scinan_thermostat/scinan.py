@@ -20,6 +20,8 @@ DEFAULT_TIMEOUT = 30
 HEADERS = {'User-Agent': USER_AGENT}
 COMPANY_ID_THERMOSTAT = 1038  # 1038 is a thermostat, 1015 is a gateway
 NEED_TOKEN_ERROR_CODE = 10002
+MIN_TEMP = 5
+MAX_TEMP = 35
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -297,7 +299,7 @@ class ScinanApi:
         if isinstance(value, bool):
             control_value = "1" if value else "0"
         elif isinstance(value, float):
-            control_value = f"{value:.1f}"
+            control_value = f"{min(max(value, MIN_TEMP), MAX_TEMP):04.1f}"
 
         old_value = None
         if device_id in self.devices:

@@ -21,7 +21,7 @@
     "step": {
       "init": {
         "data": {
-          "update_interval": "Time between updates (seconds)"
+          "scan_interval": "Time between updates (seconds)"
         }
       }
     },

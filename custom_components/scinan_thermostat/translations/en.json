@@ -5,7 +5,8 @@
     },
     "error": {
       "auth_error": "Invalid email or password",
-      "cannot_connect": "Authentication error, try again later"
+      "cannot_connect": "Authentication timeout, try again later",
+      "unknown": "Unexpected error"
     },
     "step": {
       "user": {
@@ -14,6 +15,18 @@
           "username": "Username"
         }
       }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "update_interval": "Time between updates (seconds)"
+        }
+      }
+    },
+    "error": {
+      "invalid_interval": "Must be number between 60 and 86400 seconds"
     }
   }
 }

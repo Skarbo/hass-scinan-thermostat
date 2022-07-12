@@ -4,7 +4,8 @@
       "already_configured": "[%key:common::config_flow::abort::already_configured_account%]"
     },
     "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]"
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "step": {
       "user": {
@@ -13,6 +14,18 @@
           "password": "[%key:common::config_flow::data::password%]"
         }
       }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "update_interval": "Time between updates (seconds)"
+        }
+      }
+    },
+    "error": {
+      "invalid_interval": "Must be number between 60 and 86400 seconds"
     }
   }
 }

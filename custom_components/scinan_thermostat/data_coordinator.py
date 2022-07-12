@@ -11,7 +11,7 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import DOMAIN
+from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
 from .scinan import ScinanApi, ScinanInvalidTokenError, ScinanResponseError
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,16 +23,29 @@ class ScinanDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
-        scinan_api: ScinanApi
+        scinan_api: ScinanApi,
+        update_interval: int = DEFAULT_UPDATE_INTERVAL,
     ) -> None:
         """Initialize global Scinan data updater."""
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=300),
+            update_interval=timedelta(seconds=update_interval),
         )
         self.scinan_api = scinan_api
+
+    async def set_update_interval(self, update_interval: int) -> None:
+        """Update update interval. Trigger refresh."""
+        if self.update_interval.seconds == update_interval:
+            return
+
+        _LOGGER.debug("update coordinator interval %s", update_interval)
+
+        self.update_interval = timedelta(
+            seconds=update_interval,
+        )
+        await self.async_refresh()
 
     async def _async_update_data(self):
         """Update devices."""

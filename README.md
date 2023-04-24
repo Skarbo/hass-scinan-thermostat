@@ -6,6 +6,10 @@ Custom component to support Scinan Thermostats.
 
 ![Climate entity](assets/images/climage_image.png)
 
+## :warning: Breaking changes after April 2023 :construction:
+
+Saswell applications have updated the APIs making all the climate entities unavailable. [A new release is underway](https://github.com/Skarbo/hass-scinan-thermostat/issues/1).
+
 ## Supported devices
 
 Supports WiFi Thermostats using the Scinan API https://api.scinan.com.

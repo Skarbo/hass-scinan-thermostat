@@ -1,6 +1,6 @@
 {
   "domain": "scinan_thermostat",
-  "name": "Scinan Thermostat",
+  "name": "Scinan Saswell Thermostat",
   "documentation": "https://github.com/Skarbo/hass-scinan-thermostat",
   "issue_tracker": "https://github.com/Skarbo/hass-scinan-thermostat/issues",
   "requirements": [],
@@ -8,10 +8,12 @@
     "@skarbo"
   ],
   "config_flow": true,
+  "integration_type": "hub",
   "iot_class": "cloud_polling",
   "loggers": [
     "scinan",
-    "scinan_thermostat"
+    "scinan_thermostat",
+    "scinan_thermostat.api"
   ],
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

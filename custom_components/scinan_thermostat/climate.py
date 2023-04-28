@@ -7,21 +7,35 @@ from homeassistant.components.climate import (
 )
 from homeassistant.components.climate.const import (
     ClimateEntityFeature,
-    HVACAction, PRESET_COMFORT,
+    HVACAction,
+    PRESET_COMFORT,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_TEMPERATURE,
-    CONF_USERNAME, PRECISION_HALVES, TEMP_CELSIUS,
+    CONF_USERNAME,
+    PRECISION_HALVES,
+    TEMP_CELSIUS,
 )
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import (
+    callback,
+    HomeAssistant,
+)
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, MANUFACTURER, MAX_TEMP, MIN_TEMP
+from .api import (
+    DEVICE_TEMP_MAX,
+    DEVICE_TEMP_MIN,
+    ScinanDevice,
+    ScinanDeviceMode,
+)
+from .const import (
+    DOMAIN,
+    MANUFACTURER,
+)
 from .data_coordinator import ScinanDataUpdateCoordinator
-from .scinan import ScinanDevice, ScinanDeviceMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,8 +64,8 @@ async def async_setup_entry(
 # noinspection PyAbstractClass
 class ScinanClimate(CoordinatorEntity, ClimateEntity):
     """Representation of Scinan climate device."""
-    _attr_max_temp = MAX_TEMP
-    _attr_min_temp = MIN_TEMP
+    _attr_max_temp = DEVICE_TEMP_MAX
+    _attr_min_temp = DEVICE_TEMP_MIN
     _attr_temperature_unit = TEMP_CELSIUS
     _attr_target_temperature_step = PRECISION_HALVES
     _attr_supported_features = (

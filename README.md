@@ -1,18 +1,15 @@
-# Home Assistant integration for Scinan Thermostats
+# Home Assistant integration for Scinan Saswell Thermostats
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/skarbo/hass-scinan-thermostat)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/skarbo/hass-scinan-thermostat)
 
-Custom component to support Scinan Thermostats.
 
-![Climate entity](assets/images/climage_image.png)
+Custom component to support Scinan Saswell Thermostats.
 
-## :warning: Breaking changes after April 2023 :construction:
-
-Saswell applications have updated the APIs making all the climate entities unavailable. [A new release is underway](https://github.com/Skarbo/hass-scinan-thermostat/issues/1).
+![Climate entity](assets/images/climate_image.png)
 
 ## Supported devices
 
-Supports WiFi Thermostats using the Scinan API https://api.scinan.com.
+Supports WiFi Thermostats using the Scinan API https://api.scinan.com or Saswell API http://api.saswell.com.cn.
 
 Should support thermostats using an application created
 by [Saswell](https://play.google.com/store/apps/developer?id=saswell).
@@ -28,22 +25,30 @@ _Only supports devices already connected to WiFi. Refer to thermostat instructio
 
 Installed through [HACS](https://hacs.xyz/).
 
+### Install using HACS
+
+`Start HACS -> Integrations -> Explore & download repositories -> Search for "Scinan Saswell Thermostat" -> Install`
+
+`Scinan Saswell Thermostat` is now displayed in HACS integrations.
+
+Restart Home Assistant.
+
+### Install manually
+
 `Start HACS -> Integrations -> Overflow menu -> Custom repositories`
 
 Add `https://github.com/skarbo/hass-scinan-thermostat` as repository in `Repository` field.
 Select `Integration` as `Category`.
 
-`Scinan Thermostat` is now displayed in HACS integrations. Select it and press `Download this repository with HACS`.
+`Scinan Saswell Thermostat` is now displayed in HACS integrations. Select it and press `Download this repository with HACS`.
 
 Restart Home Assistant.
 
-_Will be added as a default HACS integration later on._
-
 ## Configuration
 
-Add integration in Home Assistant.
+Add integration in Home Assistant after completed installation.
 
-`Settings -> Integrations -> Add integration -> Search "Scinan Thermostat" -> Select`
+`Settings -> Integrations -> Add integration -> Search "Scinan Saswell Thermostat" -> Select`
 
 Enter email and password used for controlling your thermostats.
 
@@ -73,3 +78,21 @@ _Set devices to Comfort mode when controlled by a schedule._
   integration
 - [home-assistant](https://github.com/home-assistant/core/tree/dev/homeassistant/components/mill) Mill climate
   integration
+
+## Troubleshooting
+
+If you have authentication problems or unavailable entities, check that your account is active in your Thermostat app.
+
+If there are still authentication problems in your integration, delete and re-install the Scinan Saswell Thermostat integration.
+
+If you are still experiencing problems, check the logs and create an [issue](https://github.com/Skarbo/hass-scinan-thermostat/issues).
+
+## Changes
+
+### v1.1.0
+
+As of April 2023 all the Saswell Thermostat apps changed their API from Scinan v1.0 (https://api.scinan.com) to Saswell v2.0 (http://api.saswell.com.cn). Accounts may need to be re-activated in the Thermostat app and devices re-connected. 
+
+The integration has been updated to use Saswell v2.0 API by default. User will be prompted to re-authenticate if the account is not active with Saswell v2.0 API.
+
+Use Advanced Mode to select between v1.0/v2.0 and Scinan/Saswell APIs.

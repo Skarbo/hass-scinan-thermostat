@@ -11,8 +11,16 @@ from homeassistant.helpers.update_coordinator import (
     UpdateFailed,
 )
 
-from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
-from .scinan import ScinanApi, ScinanInvalidTokenError, ScinanResponseError
+from . import ScinanAuthFailed
+from .api import (
+    ScinanApi,
+    ScinanInvalidTokenError,
+    ScinanResponseError,
+)
+from .const import (
+    DEFAULT_UPDATE_INTERVAL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +48,7 @@ class ScinanDataUpdateCoordinator(DataUpdateCoordinator):
         if self.update_interval.seconds == update_interval:
             return
 
-        _LOGGER.debug("update coordinator interval %s", update_interval)
+        _LOGGER.debug("Update coordinator interval %s", update_interval)
 
         self.update_interval = timedelta(
             seconds=update_interval,
@@ -49,7 +57,20 @@ class ScinanDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Update devices."""
-        return await self.api_wrapper(self.scinan_api.update_devices())
+
+        async def _update_devices():
+            devices = await self.scinan_api.update_devices()
+            online_devices = [tmpDevice for tmpDevice in devices.values() if tmpDevice.online]
+
+            if len(devices) > 0 and len(online_devices) == 0:
+                _LOGGER.warning(
+                    "0 of %s online devices found, check your Thermostat app",
+                    len(devices)
+                )
+
+            return devices
+
+        return await self.api_wrapper(_update_devices())
 
     async def api_wrapper(
         self,
@@ -67,7 +88,7 @@ class ScinanDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(1)
                 await self.async_request_refresh()
             return result
-        except ScinanInvalidTokenError as err:
+        except (ScinanInvalidTokenError, ScinanAuthFailed) as err:
             raise ConfigEntryAuthFailed from err
         except ScinanResponseError as err:
             raise UpdateFailed from err

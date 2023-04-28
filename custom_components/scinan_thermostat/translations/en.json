@@ -1,18 +1,34 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Account is already configured"
+      "already_configured": "Account is already configured. Delete it first.",
+      "reauth_successful": "Account is re-authenticated"
     },
     "error": {
-      "auth_error": "Invalid email or password",
       "cannot_connect": "Authentication timeout, try again later",
-      "unknown": "Unexpected error"
+      "unknown": "Unexpected error. Check the logs for more info.",
+      "invalid_email": "Invalid email address.",
+      "missing_username": "Missing email address.",
+      "missing_password": "Missing password."
     },
     "step": {
       "user": {
+        "description": "Use the credentials from your Thermostat app.",
         "data": {
+          "username": "Email",
           "password": "Password",
-          "username": "Username"
+          "api_version": "API Version",
+          "domain": "API Domain"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate with Scinan Saswell Thermostat",
+        "description": "Check that your account exists in your Thermostat app.",
+        "data": {
+          "username": "Email",
+          "password": "Password",
+          "api_version": "API Version",
+          "domain": "API Domain"
         }
       }
     }

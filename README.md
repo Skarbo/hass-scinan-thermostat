@@ -17,6 +17,7 @@ by [Saswell](https://play.google.com/store/apps/developer?id=saswell).
 Known supported devices:
 
 - Saswell SAS920FHL-7W-WIFI
+- Saswell SAS922WHL-7W-S-WIFI
 - Prosmart PST50W
 
 _Only supports devices already connected to WiFi. Refer to thermostat instruction manuel on how to connect to WiFi._

@@ -10,6 +10,10 @@ from .types import (
     ScinanDeviceResponseType,
     ScinanDeviceStatusType,
 )
+from .const import (
+    DEVICE_TEMP_MAX,
+    DEVICE_TEMP_MIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,8 +84,8 @@ def create_device_status(status: str) -> ScinanDeviceStatusType:
         'target_temperature': float(status_arr[3]),
         'away': status_arr[5] == "1",
         'mode': int(status_arr[9]),
-        'min_temp': float(status_arr[10]),
-        'max_temp': float(status_arr[11]),
+        'min_temp': float(status_arr[10]) if len(status_arr) > 10 else DEVICE_TEMP_MIN,
+        'max_temp': float(status_arr[11]) if len(status_arr) > 11 else DEVICE_TEMP_MAX,
     }
 
 

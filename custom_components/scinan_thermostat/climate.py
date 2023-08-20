@@ -8,6 +8,7 @@ from homeassistant.components.climate import (
 from homeassistant.components.climate.const import (
     ClimateEntityFeature,
     HVACAction,
+    PRESET_AWAY,
     PRESET_COMFORT,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -74,10 +75,10 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
     )
     _attr_preset_modes = [
         CLIMATE_PRESET_AUTO,
+        PRESET_AWAY,
         PRESET_COMFORT,
         CLIMATE_PRESET_DAY_OR_NIGHT,
     ]
-    """Off represents away"""
     _attr_hvac_modes = [HVACMode.HEAT, HVACMode.OFF]
 
     coordinator: ScinanDataUpdateCoordinator
@@ -126,9 +127,9 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
     def hvac_mode(self) -> HVACMode:
         """Return device HVAC mode."""
         return (
-            HVACMode.OFF
-            if self.is_away else
             HVACMode.HEAT
+            if self.device.is_on else
+            HVACMode.OFF
         )
 
     @property
@@ -143,6 +144,8 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
     @property
     def preset_mode(self) -> str:
         """Return device preset mode."""
+        if self.is_away:
+            return PRESET_AWAY
         if self.device.mode == ScinanDeviceMode.COMFORT:
             return PRESET_COMFORT
         if self.device.mode == ScinanDeviceMode.DAY_OR_NIGHT:
@@ -170,44 +173,61 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
             was_away
         )
         if not was_away:
-            await self.async_update_ha_state()
+            self.async_write_ha_state()
 
     async def async_turn_on(self) -> None:
-        """Turn the device on. Using the away feature to turn on."""
+        """Turn the device on."""
         await self.coordinator.api_wrapper(
-            self.coordinator.scinan_api.set_home_away(self._id, False),
+            self.coordinator.scinan_api.set_on_off(self._id, True),
             True,
         )
 
     async def async_turn_off(self) -> None:
-        """Turn the device off. Using the away feature to turn off."""
+        """Turn the device off."""
         await self.coordinator.api_wrapper(
-            self.coordinator.scinan_api.set_home_away(self._id, True),
+            self.coordinator.scinan_api.set_on_off(self._id, False),
             True,
         )
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
         await self.coordinator.api_wrapper(
-            self.coordinator.scinan_api.set_home_away(
+            self.coordinator.scinan_api.set_on_off(
                 self._id,
-                hvac_mode == HVACMode.OFF
+                hvac_mode == HVACMode.HEAT
             ),
             True,
         )
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
-        mode = ScinanDeviceMode.AUTO
-        if preset_mode == PRESET_COMFORT:
-            mode = ScinanDeviceMode.COMFORT
-        elif preset_mode == CLIMATE_PRESET_DAY_OR_NIGHT:
-            mode = ScinanDeviceMode.DAY_OR_NIGHT
+        if preset_mode == PRESET_AWAY:
+            await self.coordinator.api_wrapper(
+                self.coordinator.scinan_api.set_home_away(
+                    self._id,
+                    True,
+                ),
+                True,
+            )
+        else:
+            if self.is_away:
+                await self.coordinator.api_wrapper(
+                    self.coordinator.scinan_api.set_home_away(
+                        self._id,
+                        False,
+                    ),
+                    False,
+                )
+            mode = ScinanDeviceMode.AUTO
+            if preset_mode == PRESET_COMFORT:
+                mode = ScinanDeviceMode.COMFORT
+            elif preset_mode == CLIMATE_PRESET_DAY_OR_NIGHT:
+                mode = ScinanDeviceMode.DAY_OR_NIGHT
 
-        await self.coordinator.api_wrapper(
-            self.coordinator.scinan_api.set_mode(self._id, mode),
-            True,
-        )
+            await self.coordinator.api_wrapper(
+                self.coordinator.scinan_api.set_mode(self._id, mode),
+                True,
+            )
 
     @callback
     def _handle_coordinator_update(self) -> None:

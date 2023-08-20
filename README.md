@@ -60,9 +60,9 @@ a [Climate entity](https://www.home-assistant.io/integrations/climate/).
 
 - Change temperature
 - HVAC mode: Heat / Off
-- Preset: Auto / Comfort / Day or night
+- Preset: Auto / Away / Comfort / Day or night
 
-_Turning off device is not supported by API, will be set as Away when using HVAC Off._
+_If Turning off device is not supported by API, please set the preset mode to Away instead._
 
 ### Schedule / program
 

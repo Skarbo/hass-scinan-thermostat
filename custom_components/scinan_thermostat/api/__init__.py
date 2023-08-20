@@ -375,7 +375,7 @@ class ScinanApi:
         # v1.0 device list response
         if self._api_version == ScinanVersion.V1:
             return data
-        print(data)
+
         # v2.0 device list response
         if isinstance(data, list) is False or len(data) == 0:
             _LOGGER.warning("Device list result data should be a list")

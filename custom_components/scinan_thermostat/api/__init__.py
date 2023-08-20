@@ -24,7 +24,8 @@ from .const import (
     DEVICE_COMPANY_ID_THERMOSTAT,
     DEVICE_TEMP_MAX,
     DEVICE_TEMP_MIN,
-    DEVICE_TYPE_THERMOSTAT,
+    DEVICE_TYPE_WHL_THERMOSTAT,
+    DEVICE_TYPE_FHL_THERMOSTAT,
 )
 from .device import ScinanDevice
 from .enums import (
@@ -380,7 +381,8 @@ class ScinanApi:
             _LOGGER.warning("Device list result data should be a list")
             raise ScinanResponseError("Invalid device list response")
 
-        item = next((item for item in data if item['type'] == DEVICE_TYPE_THERMOSTAT), None)
+        supported_devices = (DEVICE_TYPE_WHL_THERMOSTAT, DEVICE_TYPE_FHL_THERMOSTAT)
+        item = next((item for item in data if item['type'] in supported_devices), None)
 
         if item is None:
             _LOGGER.warning("Device list result data did not contain a list of thermostats")

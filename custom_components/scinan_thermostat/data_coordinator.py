@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 from typing import Coroutine
 
+from aiohttp import ClientOSError
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import (
@@ -90,5 +91,5 @@ class ScinanDataUpdateCoordinator(DataUpdateCoordinator):
             return result
         except (ScinanInvalidTokenError, ScinanAuthFailed) as err:
             raise ConfigEntryAuthFailed from err
-        except ScinanResponseError as err:
+        except (ScinanResponseError, ClientOSError) as err:
             raise UpdateFailed from err

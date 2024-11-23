@@ -2,6 +2,7 @@
 import asyncio
 import logging
 
+from aiohttp import ClientOSError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_API_VERSION,
@@ -9,6 +10,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
+    CONF_API_TOKEN,
     Platform,
 )
 from homeassistant.core import HomeAssistant
@@ -62,13 +64,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     scinan_api = ScinanApi(
         username,
         entry.data.get(CONF_PASSWORD),
+        token=entry.data.get(CONF_API_TOKEN),
         web_session=async_get_clientsession(hass),
         api_version=entry.data.get(CONF_API_VERSION),
         api_domain=entry.data.get(CONF_DOMAIN),
     )
 
     try:
-        await scinan_api.authenticate()
+        await asyncio.sleep(3)  # wait a bit
+        await scinan_api.update_devices()
     except ScinanAuthFailed as err:
         raise ConfigEntryAuthFailed(
             f"Authenticate failed for {username}",
@@ -76,6 +80,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except asyncio.TimeoutError as err:
         raise ConfigEntryNotReady(
             f"Authenticate timed out for {username}",
+        ) from err
+    except ClientOSError as err:
+        raise ConfigEntryNotReady(
+            f"Connection reset for {username}",
         ) from err
 
     scinan_data_coordinator = ScinanDataUpdateCoordinator(

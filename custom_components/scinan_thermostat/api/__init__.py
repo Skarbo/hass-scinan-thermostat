@@ -10,7 +10,7 @@ from typing import (
 
 import aiohttp
 import async_timeout
-from aiohttp.client_exceptions import ClientResponse
+from aiohttp.client_exceptions import ClientResponse, ClientOSError
 
 from .const import (
     API_DOMAIN_SASWELL,
@@ -243,12 +243,22 @@ class ScinanApi:
                 raise err
 
             _LOGGER.debug("Invalid token, forcing re-auth")
-            await asyncio.sleep(1)  # wait a bit before authenticating
+            await asyncio.sleep(3)  # wait a bit before authenticating
             await self.authenticate()
 
             _LOGGER.debug("Re-authenticated, retrying request %s", url)
-            await asyncio.sleep(1)  # wait a bit before retrying
+            await asyncio.sleep(3)  # wait a bit before retrying
             return await self.request(uri, params, retrying=True)
+        except ClientOSError as err:
+            if retry is False or retrying is True:
+                raise err
+
+            if err.errno == 104:
+                _LOGGER.debug("Connection reset by peer, retrying request %s", url)
+                await asyncio.sleep(3)  # wait a bit before retrying
+                return await self.request(uri, params, retrying=True)
+
+            raise err
 
     def _prepare_request_params(self, params: dict) -> dict:
         """Prepare request params"""

@@ -15,6 +15,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
     CONF_USERNAME,
+    CONF_API_TOKEN,
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
@@ -246,6 +247,7 @@ class ScinanConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_PASSWORD: result['password'],
             CONF_DOMAIN: result['api_domain'],
             CONF_API_VERSION: result['api_version'],
+            CONF_API_TOKEN: result['token'],
         }
 
         if self._reauth_entry:

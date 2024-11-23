@@ -16,7 +16,7 @@ from homeassistant.const import (
     ATTR_TEMPERATURE,
     CONF_USERNAME,
     PRECISION_HALVES,
-    TEMP_CELSIUS,
+    UnitOfTemperature,
 )
 from homeassistant.core import (
     callback,
@@ -67,11 +67,13 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
     """Representation of Scinan climate device."""
     _attr_max_temp = DEVICE_TEMP_MAX
     _attr_min_temp = DEVICE_TEMP_MIN
-    _attr_temperature_unit = TEMP_CELSIUS
+    _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_target_temperature_step = PRECISION_HALVES
     _attr_supported_features = (
         ClimateEntityFeature.TARGET_TEMPERATURE
         | ClimateEntityFeature.PRESET_MODE
+        | ClimateEntityFeature.TURN_ON
+        | ClimateEntityFeature.TURN_OFF
     )
     _attr_preset_modes = [
         CLIMATE_PRESET_AUTO,

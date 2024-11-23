@@ -29,6 +29,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .api import (
     DEVICE_TEMP_MAX,
     DEVICE_TEMP_MIN,
+    DEVICE_TYPE_FHL_THERMOSTAT,
     ScinanDevice,
     ScinanDeviceMode,
 )
@@ -130,7 +131,7 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
         """Return device HVAC mode."""
         return (
             HVACMode.HEAT
-            if self.device.is_on else
+            if self.is_on else
             HVACMode.OFF
         )
 
@@ -159,6 +160,14 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
         """Return True if device is away."""
         return self.device.away
 
+    @property
+    def is_on(self) -> bool:
+        """Return True if device is on."""
+        if self.device.type is DEVICE_TYPE_FHL_THERMOSTAT:
+            return not self.device.away
+
+        return self.device.is_on
+
     async def async_set_temperature(self, **kwargs) -> None:
         """Set new target temperatures."""
         if (temperature := kwargs.get(ATTR_TEMPERATURE)) is None:
@@ -179,6 +188,12 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
 
     async def async_turn_on(self) -> None:
         """Turn the device on."""
+        if self.device.type is DEVICE_TYPE_FHL_THERMOSTAT:
+            return await self.coordinator.api_wrapper(
+                self.coordinator.scinan_api.set_home_away(self._id, False),
+                True,
+            )
+
         await self.coordinator.api_wrapper(
             self.coordinator.scinan_api.set_on_off(self._id, True),
             True,
@@ -186,6 +201,13 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
 
     async def async_turn_off(self) -> None:
         """Turn the device off."""
+
+        if self.device.type is DEVICE_TYPE_FHL_THERMOSTAT:
+            return await self.coordinator.api_wrapper(
+                self.coordinator.scinan_api.set_home_away(self._id, True),
+                True,
+            )
+
         await self.coordinator.api_wrapper(
             self.coordinator.scinan_api.set_on_off(self._id, False),
             True,
@@ -193,11 +215,14 @@ class ScinanClimate(CoordinatorEntity, ClimateEntity):
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new target hvac mode."""
+        if self.device.type is DEVICE_TYPE_FHL_THERMOSTAT:
+            return await self.coordinator.api_wrapper(
+                self.coordinator.scinan_api.set_home_away(self._id, hvac_mode == HVACMode.OFF),
+                True,
+            )
+
         await self.coordinator.api_wrapper(
-            self.coordinator.scinan_api.set_on_off(
-                self._id,
-                hvac_mode == HVACMode.HEAT
-            ),
+            self.coordinator.scinan_api.set_on_off(self._id, hvac_mode == HVACMode.HEAT),
             True,
         )
 

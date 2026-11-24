@@ -1,0 +1,29 @@
+# Dev tooling only (tests and lint). The integration itself has no build step.
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ASYNC", "D"]
+ignore = ["ASYNC109", "D202", "D203", "D212"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+
+# Same import sorting and docstring style as Home Assistant core.
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.coverage.report]
+exclude_also = ["raise NotImplementedError"]
+

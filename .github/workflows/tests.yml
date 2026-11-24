@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests (HA ${{ matrix.ha }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest tested HA: devices can belong to several config entries.
+          - ha: "2026.2"
+            python: "3.13"
+            phcc: "0.13.316"
+          # Newer HA: a device belongs to one config entry (HA 2026.10+).
+          - ha: "2026.10"
+            python: "3.14"
+            phcc: "0.13.375"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: false
+      - name: Install
+        run: |
+          uv venv
+          uv pip install "pytest-homeassistant-custom-component==${{ matrix.phcc }}" pytest-timeout ruff \
+            -r <(jq -r '.requirements[]' custom_components/scinan_thermostat/manifest.json)
+      - name: Lint
+        run: uv run --no-project ruff check .
+      - name: Test
+        run: uv run --no-project pytest -p no:cacheprovider --timeout 60

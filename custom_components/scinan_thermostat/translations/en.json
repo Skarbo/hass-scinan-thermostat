@@ -1,48 +1,182 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Account is already configured. Delete it first.",
-      "reauth_successful": "Account is re-authenticated"
+      "already_configured": "This account or thermostat is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "The thermostat was updated.",
+      "wrong_device": "That IP address belongs to a different thermostat."
     },
     "error": {
-      "cannot_connect": "Authentication timeout, try again later",
+      "cannot_connect": "Nothing answered at this IP address. Check the IP in your router, and that Home Assistant can reach the thermostat's network (VLAN/firewall: TCP port 2000).",
+      "invalid_auth": "Wrong email or password, or the account is blocked after too many wrong passwords.",
+      "not_a_thermostat": "The device at this IP address answered, but not like a Saswell thermostat.",
       "unknown": "Unexpected error. Check the logs for more info.",
-      "invalid_email": "Invalid email address.",
-      "missing_username": "Missing email address.",
-      "missing_password": "Missing password."
+      "invalid_host": "That's not a valid IP address. Enter it like 192.168.1.50.",
+      "unknown_host": "No device with this name was found on your network. Enter the IP address instead (like 192.168.1.50).",
+      "connection_refused": "A device answered at this IP address, but not on the thermostat port (2000). It's probably not the thermostat; check the IP.",
+      "no_answer": "The thermostat at this IP address connected but didn't send its status. Try again in a moment."
     },
     "step": {
       "user": {
-        "description": "Use the credentials from your Thermostat app.",
+        "title": "Connection type",
+        "description": "Local talks directly to one thermostat on your network (recommended, instant updates, no cloud). Cloud uses your Thermostat app account.",
+        "menu_options": {
+          "local": "Local (one thermostat by IP address)",
+          "cloud": "Cloud (Thermostat app account)"
+        }
+      },
+      "local": {
+        "title": "Local thermostat",
+        "description": "Enter the thermostat's IP address. Give it a fixed IP (DHCP reservation) in your router. The thermostat must already be on your Wi-Fi. It works even if it no longer shows in the Thermostat app or your cloud account (this can happen after changing its Wi-Fi).",
+        "data": {
+          "host": "IP address"
+        },
+        "data_description": {
+          "host": "The thermostat's IP address on your network, for example 192.168.1.50. Find it in your router's list of connected devices."
+        }
+      },
+      "cloud": {
+        "title": "Cloud account",
+        "description": "Use the credentials from your Thermostat app. Note: the Saswell cloud only supports plain HTTP.",
         "data": {
           "username": "Email",
-          "password": "Password",
-          "api_version": "API Version",
-          "domain": "API Domain"
+          "password": "Password"
+        },
+        "data_description": {
+          "username": "The email address you log in to the Saswell Thermostat app with.",
+          "password": "The password of your Thermostat app account."
         }
       },
       "reauth_confirm": {
-        "title": "Re-authenticate with Scinan Saswell Thermostat",
-        "description": "Check that your account exists in your Thermostat app.",
+        "title": "Re-authenticate",
+        "description": "Enter the password for {username}. Check that the account still works in the Thermostat app.",
         "data": {
-          "username": "Email",
-          "password": "Password",
-          "api_version": "API Version",
-          "domain": "API Domain"
+          "password": "Password"
+        },
+        "data_description": {
+          "password": "The current password of your Thermostat app account."
+        }
+      },
+      "reconfigure": {
+        "title": "Change IP address",
+        "description": "Enter the thermostat's new IP address.",
+        "data": {
+          "host": "IP address"
+        },
+        "data_description": {
+          "host": "The thermostat's IP address on your network, for example 192.168.1.50. Find it in your router's list of connected devices."
+        }
+      },
+      "reconfigure_cloud": {
+        "title": "Update cloud password",
+        "description": "Enter the current password of the Thermostat app account {username}. Use this after changing the password in the app.\n\nTo use another account, add it as a new cloud hub.",
+        "data": {
+          "password": "Password"
+        },
+        "data_description": {
+          "password": "The current password of your Thermostat app account."
         }
       }
     }
   },
   "options": {
+    "abort": {
+      "nothing_to_move": "All thermostats of this account are already local.",
+      "nothing_moved": "No IP addresses were entered, so nothing was moved.",
+      "entry_removed": "The cloud account was removed."
+    },
+    "error": {
+      "cannot_connect": "Nothing answered at this IP address. Check the IP in your router, and that Home Assistant can reach the thermostat's network (VLAN/firewall: TCP port 2000).",
+      "wrong_device": "This IP address belongs to a different thermostat.",
+      "duplicate_ip": "You already entered this IP address for another thermostat.",
+      "not_a_thermostat": "The device at this IP address answered, but not like a Saswell thermostat.",
+      "unknown": "Unexpected error. Check the logs for more info.",
+      "invalid_host": "That's not a valid IP address. Enter it like 192.168.1.50.",
+      "unknown_host": "No device with this name was found on your network. Enter the IP address instead (like 192.168.1.50).",
+      "connection_refused": "A device answered at this IP address, but not on the thermostat port (2000). It's probably not the thermostat; check the IP.",
+      "no_answer": "The thermostat at this IP address connected but didn't send its status. Try again in a moment."
+    },
     "step": {
       "init": {
+        "title": "Options",
+        "menu_options": {
+          "move_to_local": "Move thermostats to local control",
+          "settings": "Cloud update interval"
+        }
+      },
+      "settings": {
+        "title": "Cloud update interval",
         "data": {
-          "scan_interval": "Time between updates (seconds)"
+          "scan_interval": "Time between cloud updates (seconds)"
+        },
+        "data_description": {
+          "scan_interval": "How often Home Assistant asks the cloud for new values. Local thermostats don't use this; they send changes instantly."
+        }
+      },
+      "move_to_local": {
+        "title": "Move thermostats to local control",
+        "description": "{count} thermostat(s) in {account} can be moved to local control:\n\n{names}\n\nOn the next steps you enter the local IP address of each one. Leave the IP empty to keep that thermostat in the cloud.\n\nA moved thermostat keeps its name, area, entity ID and history. Give each one a fixed IP address (DHCP reservation) in your router."
+      },
+      "move_device": {
+        "title": "{name}",
+        "description": "Thermostat {index} of {total}: **{name}** (ID `{device_id}`).\n\nEnter its local IP address to control it locally, or leave it empty to keep it in the cloud.",
+        "data": {
+          "host": "IP address"
+        },
+        "data_description": {
+          "host": "For example 192.168.1.50. Find it in your router's list of connected devices."
+        }
+      }
+    }
+  },
+  "issues": {
+    "local_available": {
+      "title": "Local control is available for {account}",
+      "fix_flow": {
+        "step": {
+          "move_to_local": {
+            "title": "Move thermostats to local control",
+            "description": "Your thermostats can now be controlled directly on your network: instant updates, no cloud needed.\n\n{count} thermostat(s) in {account} can be moved to local control:\n\n{names}\n\nOn the next steps you enter the local IP address of each one. Leave the IP empty to keep that thermostat in the cloud.\n\nA moved thermostat keeps its name, area, entity ID and history. Give each one a fixed IP address (DHCP reservation) in your router.\n\nTo keep using the cloud, close this and choose Ignore."
+          },
+          "move_device": {
+            "title": "{name}",
+            "description": "Thermostat {index} of {total}: **{name}** (ID `{device_id}`).\n\nEnter its local IP address to control it locally, or leave it empty to keep it in the cloud.",
+            "data": {
+              "host": "IP address"
+            },
+            "data_description": {
+              "host": "For example 192.168.1.50. Find it in your router's list of connected devices."
+            }
+          }
+        },
+        "error": {
+          "cannot_connect": "Nothing answered at this IP address. Check the IP in your router, and that Home Assistant can reach the thermostat's network (VLAN/firewall: TCP port 2000).",
+          "wrong_device": "This IP address belongs to a different thermostat.",
+          "duplicate_ip": "You already entered this IP address for another thermostat.",
+          "not_a_thermostat": "The device at this IP address answered, but not like a Saswell thermostat.",
+          "unknown": "Unexpected error. Check the logs for more info.",
+          "invalid_host": "That's not a valid IP address. Enter it like 192.168.1.50.",
+          "unknown_host": "No device with this name was found on your network. Enter the IP address instead (like 192.168.1.50).",
+          "connection_refused": "A device answered at this IP address, but not on the thermostat port (2000). It's probably not the thermostat; check the IP.",
+          "no_answer": "The thermostat at this IP address connected but didn't send its status. Try again in a moment."
+        },
+        "abort": {
+          "nothing_to_move": "All thermostats of this account are already local.",
+          "nothing_moved": "No IP addresses were entered, so nothing was moved.",
+          "entry_removed": "The cloud account was removed."
         }
       }
     },
-    "error": {
-      "invalid_interval": "Must be number between 60 and 86400 seconds"
+    "cloud_empty": {
+      "title": "The cloud account {account} is no longer needed",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Remove cloud account",
+            "description": "All thermostats of {account} are controlled locally now. Submit to remove the cloud account from Home Assistant. The thermostats and their local entries are not affected."
+          }
+        }
+      }
     }
   }
 }

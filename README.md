@@ -1,99 +1,120 @@
-# Home Assistant integration for Scinan Saswell Thermostats
+# Scinan Saswell Thermostat for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/skarbo/hass-scinan-thermostat)
+[![Marketplace](https://img.shields.io/badge/Marketplace%20%2F%20HACS-Default-41BDF5.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Skarbo&repository=hass-scinan-thermostat&category=integration)
 
-
-Custom component to support Scinan Saswell Thermostats.
+Control Saswell (Scinan) Wi-Fi thermostats locally, or through the Saswell cloud.
 
 ![Climate entity](assets/images/climate_image.png)
 
 ## Supported devices
 
-Supports WiFi Thermostats using the Scinan API https://api.scinan.com or Saswell API http://api.saswell.com.cn.
+Thermostats that use a Saswell "Thermostat" app, for example:
 
-Should support thermostats using an application created
-by [Saswell](https://play.google.com/store/apps/developer?id=saswell).
-
-Known supported devices:
-
-- Saswell SAS920FHL-7W-WIFI
-- Saswell SAS922WHL-7W-S-WIFI
+- Saswell SAS920FHL-7W-WIFI (electric floor heating)
+- Saswell SAS922WHL-7W-S-WIFI (water floor heating)
+- T13FHL-7(EN) WIFI (electric floor heating)
 - Prosmart PST50W
 
-_Only supports devices already connected to WiFi. Refer to thermostat instruction manuel on how to connect to WiFi._
+The thermostat must already be on your Wi-Fi. Set it up with the Thermostat app.
+
+## Local or cloud
+
+| | Local (recommended) | Cloud |
+|---|---|---|
+| Adds | One thermostat, by IP address | All thermostats on your app account |
+| Updates | Instant | Every 5 minutes |
+| Needs internet | No | Yes |
+
+- Local needs TCP port 2000 open from Home Assistant to the thermostat. Give it a fixed IP in your router.
+- The phone app keeps working alongside.
+- The Saswell cloud only uses plain HTTP (no encryption).
 
 ## Installation
 
-Installed through [HACS](https://hacs.xyz/).
+[![Open in the Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Skarbo&repository=hass-scinan-thermostat&category=integration)
 
-### Install using HACS
+**Marketplace:** `Settings -> Marketplace`, search for **Scinan Saswell Thermostat**, select **Install**, and
+restart Home Assistant.
 
-`Start HACS -> Integrations -> Explore & download repositories -> Search for "Scinan Saswell Thermostat" -> Install`
+**HACS** (older Home Assistant versions): open HACS, search for **Scinan Saswell Thermostat**, select
+**Download**, and restart Home Assistant.
 
-`Scinan Saswell Thermostat` is now displayed in HACS integrations.
+**Manual:** copy `custom_components/scinan_thermostat` from the
+[latest release](https://github.com/Skarbo/hass-scinan-thermostat/releases) into your `custom_components`
+folder, and restart Home Assistant.
 
-Restart Home Assistant.
+## Setup
 
-### Install manually
+`Settings -> Devices & services -> Add integration -> Scinan Saswell Thermostat`, then choose:
 
-`Start HACS -> Integrations -> Overflow menu -> Custom repositories`
+- **Local:** enter the thermostat's IP address. Repeat for each thermostat.
+- **Cloud:** enter the email and password of your Thermostat app account.
 
-Add `https://github.com/skarbo/hass-scinan-thermostat` as repository in `Repository` field.
-Select `Integration` as `Category`.
+Use **Reconfigure** on an entry to change the IP address (local) or the password (cloud).
 
-`Scinan Saswell Thermostat` is now displayed in HACS integrations. Select it and press `Download this repository with HACS`.
+### Moving from cloud to local
 
-Restart Home Assistant.
+Open the cloud entry's options and choose **Move thermostats to local control** (a Repairs notice also
+offers it). Enter the IP address of each thermostat you want to move. Names, areas, entity IDs and history
+are kept.
 
-## Configuration
+## Features
 
-Add integration in Home Assistant after completed installation.
-
-`Settings -> Integrations -> Add integration -> Search "Scinan Saswell Thermostat" -> Select`
-
-Enter email and password used for controlling your thermostats.
-
-Each thermostat registered to your account will be added as
-a [Climate entity](https://www.home-assistant.io/integrations/climate/).
-
-## Supported features
-
-- Change temperature
+- Target temperature (0.5 °C steps)
 - HVAC mode: Heat / Off
-- Preset: Auto / Away / Comfort / Day or night
+- Presets: Auto / Away / Comfort / Day or night
 
-_If Turning off device is not supported by API, please set the preset mode to Away instead._
+Good to know:
 
-### Schedule / program
-
-Changing thermostat program is not supported. Use a schedule integration
-(ie. [scheduler-card](https://github.com/nielsfaber/scheduler-card)) instead.
-
-_Set devices to Comfort mode when controlled by a schedule._
-
-## Inspiration
-
-- [com.scinan.api](https://github.com/PetterRuud/com.scinan.api/) Scinan controllers for Homey
-- [node-red-contrib-scinan](https://github.com/lodegaard/node-red-contrib-scinan) Scinan integration for Node Red
-- [HAExtra](https://github.com/hdcola/HAExtra/blob/master/custom_components/climate/saswell.py) Saswell climate
-  integration
-- [home-assistant](https://github.com/home-assistant/core/tree/dev/homeassistant/components/mill) Mill climate
-  integration
+- **Off** sets **Away** (5 °C) on electric floor heating thermostats (SAS920FHL, T13FHL), because they ignore
+  the power command. Water floor heating thermostats turn off.
+- Setting a temperature ends Away.
+- **Auto** follows the thermostat's own schedule.
+- Heating/idle is estimated (current temperature below target). The thermostat doesn't report it.
+- Changing the thermostat's schedule isn't supported. Use a scheduler (for example
+  [scheduler-card](https://github.com/nielsfaber/scheduler-card)) with the Comfort preset.
 
 ## Troubleshooting
 
-If you have authentication problems or unavailable entities, check that your account is active in your Thermostat app.
+**Local entity unavailable:** check that Home Assistant can reach the IP on port 2000, and that the IP hasn't
+changed. After a power cut the thermostat reconnects by itself.
 
-If there are still authentication problems in your integration, delete and re-install the Scinan Saswell Thermostat integration.
+**Thermostat gone from the app after changing its Wi-Fi:** it still works. Add it as Local with its new IP
+address. Redoing the setup in the app with the phone online may bring it back to the app.
 
-If you are still experiencing problems, check the logs and create an [issue](https://github.com/Skarbo/hass-scinan-thermostat/issues).
+**Cloud login problems:** check that the account works in the Thermostat app, then use **Reconfigure** to
+enter the password again.
+
+Still stuck? Check the logs and open an [issue](https://github.com/Skarbo/hass-scinan-thermostat/issues).
+
+## Removing
+
+Delete the entries in `Settings -> Devices & services -> Scinan Saswell Thermostat`. When you delete the last
+one, Home Assistant offers to uninstall the files too.
 
 ## Changes
 
+### v2.0.0
+
+- Local control with instant updates.
+- Move thermostats from cloud to local, keeping names and history.
+- Reconfigure for IP address and cloud password.
+- Support for the T13FHL-7(EN) WIFI (device type 3). Thanks to jsvdmeer.
+- Removed the old Scinan v1.0 API. Old entries move to the Saswell v2.0 API automatically.
+- Requires Home Assistant 2025.2 or newer.
+- License changed from GPL-3.0 to MIT (earlier versions stay GPL-3.0).
+
 ### v1.1.0
 
-As of April 2023 all the Saswell Thermostat apps changed their API from Scinan v1.0 (https://api.scinan.com) to Saswell v2.0 (http://api.saswell.com.cn). Accounts may need to be re-activated in the Thermostat app and devices re-connected. 
+Switched to the Saswell v2.0 API, which the Thermostat apps use since April 2023.
 
-The integration has been updated to use Saswell v2.0 API by default. User will be prompted to re-authenticate if the account is not active with Saswell v2.0 API.
+## Inspiration
 
-Use Advanced Mode to select between v1.0/v2.0 and Scinan/Saswell APIs.
+- [com.scinan.api](https://github.com/PetterRuud/com.scinan.api/) (Homey)
+- [node-red-contrib-scinan](https://github.com/lodegaard/node-red-contrib-scinan) (Node-RED)
+- [HAExtra](https://github.com/hdcola/HAExtra/blob/master/custom_components/climate/saswell.py) (Saswell climate)
+- [Mill](https://github.com/home-assistant/core/tree/dev/homeassistant/components/mill) (Home Assistant)
+
+## License
+
+[MIT](LICENSE)

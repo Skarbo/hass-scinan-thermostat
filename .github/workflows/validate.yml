@@ -1,0 +1,25 @@
+name: Validate
+
+# No schedule: GitHub turns off scheduled workflows after 60 days without
+# repository activity, and then they don't run on push either.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: integration
+          comment: false
